@@ -6,9 +6,10 @@ MAX_MISORDER = 100
 
 
 class JitterFrame:
-    def __init__(self, data: bytes, timestamp: int) -> None:
+    def __init__(self, data: bytes, timestamp: int, extensions) -> None:
         self.data = data
         self.timestamp = timestamp
+        self.extensions = extensions
 
 
 class JitterBuffer:
@@ -56,19 +57,24 @@ class JitterBuffer:
         packets = []
         remove = 0
         timestamp = None
+        extensions = None
 
         for count in range(self.capacity):
             pos = (self._origin + count) % self._capacity
             packet = self._packets[pos]
             if packet is None:
                 break
+            if extensions is None:
+                extensions = packet.extensions
             if timestamp is None:
                 timestamp = packet.timestamp
             elif packet.timestamp != timestamp:
                 # we now have a complete frame, only store the first one
                 if frame is None:
                     frame = JitterFrame(
-                        data=b"".join([x._data for x in packets]), timestamp=timestamp
+                        data=b"".join([x._data for x in packets]), 
+                        timestamp=timestamp,
+                        extensions=extensions
                     )
                     remove = count
 
@@ -81,6 +87,7 @@ class JitterBuffer:
                 # start a new frame
                 packets = []
                 timestamp = packet.timestamp
+                extensions = packet.extensions
 
             packets.append(packet)
 
