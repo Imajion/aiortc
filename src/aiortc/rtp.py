@@ -32,6 +32,7 @@ RTCP_PSFB_APP = 15
 
 @dataclass
 class HeaderExtensions:
+    raw = {}
     abs_send_time: Optional[int] = None
     audio_level: Any = None
     mid: Any = None
@@ -72,6 +73,7 @@ class HeaderExtensionsMap:
         for x_id, x_value in unpack_header_extensions(
             extension_profile, extension_value
         ):
+            values.raw[str(x_id)] = x_value
             if x_id == self.__ids.mid:
                 values.mid = x_value.decode("utf8")
             elif x_id == self.__ids.repaired_rtp_stream_id:

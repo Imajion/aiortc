@@ -107,6 +107,11 @@ class H264Decoder(Decoder):
             packet.pts = encoded_frame.timestamp
             packet.time_base = VIDEO_TIME_BASE
             frames = self.codec.decode(packet)
+            if hasattr(encoded_frame, 'extensions'):
+                t = frames
+                frames = []
+                for v in t:
+                    frames.append({'frame': v, 'extensions': encoded_frame.extensions})
         except av.AVError as e:
             logger.warning("failed to decode, skipping package: " + str(e))
             return []
