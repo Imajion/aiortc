@@ -111,7 +111,11 @@ class H264Decoder(Decoder):
                 t = frames
                 frames = []
                 for v in t:
-                    frames.append({'frame': v, 'extensions': encoded_frame.extensions})
+                    frames.append({'frame': v,
+                                   'pts': packet.pts,
+                                   'timebase': packet.time_base,
+                                   'extensions': encoded_frame.extensions
+                                   })
         except av.AVError as e:
             logger.warning("failed to decode, skipping package: " + str(e))
             return []
